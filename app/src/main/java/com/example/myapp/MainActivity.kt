@@ -1,46 +1,58 @@
 package com.example.myapp
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.myapp.ui.theme.MyAppTheme
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.View
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var meterEditText: EditText
+    private lateinit var convertButton: Button
+    private lateinit var resultTextView: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            MyAppTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Greeting("Android")
-                }
-            }
+        setContentView(R.layout.activity_main)
+
+        meterEditText = findViewById(R.id.editTextMeter)
+        convertButton = findViewById(R.id.buttonConvert)
+        resultTextView = findViewById(R.id.textViewResult)
+
+        convertButton.setOnClickListener {
+            convertMeterToKilometer()
         }
+
+        meterEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+                // Do nothing
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                // Enable or disable the convert button based on input
+                val input = s.toString().trim()
+                convertButton.isEnabled = input.isNotEmpty()
+            }
+
+            override fun afterTextChanged(s: Editable?) {
+                // Do nothing
+            }
+        })
     }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+    private fun convertMeterToKilometer() {
+        val meterText = meterEditText.text.toString()
+        if (meterText.isEmpty()) {
+            resultTextView.text = "Please enter a value in meters."
+            return
+        }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MyAppTheme {
-        Greeting("Android")
+        val meterValue = meterText.toDouble()
+        val kilometerValue = meterValue / 1000.0
+        resultTextView.text = "Result: $meterValue meters = $kilometerValue kilometers"
     }
 }
